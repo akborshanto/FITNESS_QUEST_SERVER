@@ -27,12 +27,26 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful 
+/* COLLECTION */
+const userCollection=  client.db('fitQuest').collection('user')
+
+
 
 /* ========================🚩🚩🚩=========================================
-                           
+                        USER COLLECTION   
 ========================================================================= */
 
+app.post('/user',async(req,res)=>{
+const query=req.body;
+console.log(query)
+const result= await userCollection.insertOne(query)
+console.table(result)
+res.send(result)
 
+
+
+
+})
 
 
 
