@@ -30,6 +30,8 @@ async function run() {
 /* COLLECTION */
 const userCollection=  client.db('fitQuest').collection('user')
 
+const newsLetterCollection=  client.db('fitQuest').collection('newsLetter')
+
 
 
 /* ========================🚩🚩🚩=========================================
@@ -48,8 +50,20 @@ res.send(result)
 
 })
 
+/* ========================🚩🚩🚩=========================================
+                        NEWS LETTER COLLECTION   
+========================================================================= */
+
+app.post('/newsLetter',async (req,res)=>{
+
+const query= req.body;
+console.log(query)
+const result= await newsLetterCollection.insertOne(query)
+res.send(result)
 
 
+
+})
 
 
 
