@@ -31,6 +31,8 @@ async function run() {
 const userCollection=  client.db('fitQuest').collection('user')
 
 const newsLetterCollection=  client.db('fitQuest').collection('newsLetter')
+const trainerCollection=  client.db('fitQuest').collection('trainer')
+const becomeTrainerCollection=  client.db('fitQuest').collection('become-trainer')
 
 
 
@@ -50,6 +52,8 @@ res.send(result)
 
 })
 
+
+
 /* ========================🚩🚩🚩=========================================
                         NEWS LETTER COLLECTION   
 ========================================================================= */
@@ -64,8 +68,38 @@ res.send(result)
 
 
 })
+/* ========================🚩🚩🚩=========================================
+                     TRAINNER BOOKING COLLECTION   
+========================================================================= */
+app.post('/trainer-booking',async (req,res)=>{
+const qury=req.body;
+console.log(qury)
+const result= await trainerCollection.insertOne(qury)
+res.send(result)
 
 
+})
+/* ========================🚩🚩🚩=========================================
+                        BEOME TRAINER COLLECTION   
+========================================================================= */
+
+/* get mehtod beacome a trainer */
+app.get('/become-trainer',async(req,res)=>{
+  const result= await becomeTrainerCollection.find().toArray()
+  res.send(result)
+})
+
+
+/* post method become a trainer */
+app.post('/become-trainer',async (req,res)=>{
+
+const becomeTrainer=req.body;
+console.log(becomeTrainer)
+const result= await becomeTrainerCollection.insertOne(becomeTrainer)
+res.send(result)
+
+
+})
 
 
     await client.db("admin").command({ ping: 1 });
