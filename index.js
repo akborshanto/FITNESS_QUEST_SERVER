@@ -57,7 +57,15 @@ res.send(result)
 /* ========================🚩🚩🚩=========================================
                         NEWS LETTER COLLECTION   
 ========================================================================= */
+/* get methos */
+app.get('/news-letter',async (req,res)=>{
+const result= await newsLetterCollection.find().toArray()
+res.send(result)
 
+})
+
+
+/* post method */
 app.post('/newsLetter',async (req,res)=>{
 
 const query= req.body;
