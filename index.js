@@ -3,13 +3,13 @@ const cors = require("cors");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
 // This is your test secret API key.
-const stripe = require("stripe")(process.env.SECRET_STRIPE);
 
 const port = process.env.PORT || 5000;
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+const stripe = require("stripe")(process.env.SECRET_STRIPE);
 
 
 /* stripe */
@@ -36,7 +36,7 @@ async function run() {
     /* COLLECTION */
     const userCollection = client.db("fitQuest").collection("user");
     const newsLetterCollection = client.db("fitQuest").collection("newsLetter");
-    const trainerCollection = client.db("fitQuest").collection("trainer");
+    const trainerCollection = client.db("fitQuest").collection("trainer-booking");
     const becomeTrainerCollection = client
       .db("fitQuest")
       .collection("become-trainer");
@@ -47,11 +47,11 @@ async function run() {
 ========================================================================= */
 
 app.post("/create-payment-intent", async (req, res) => {
-  const { price } = req.body;
+  const {price} = req.body;
   console.log(price)
-  const amount= parseInt(price * 100)
-  
-console.log(amount)
+  const amount= price * 100
+  console.log(amount)
+
   // Create a PaymentIntent with the order amount and currency
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amount,
@@ -60,8 +60,9 @@ console.log(amount)
     automatic_payment_methods: {
       enabled: true,
     },
+    payment_method_types:['card']
   });
-console.log(paymentIntent)
+
   res.send({
     clientSecret: paymentIntent.client_secret,
   });
@@ -142,8 +143,17 @@ res.send(result)
     /* ========================🚩🚩🚩=========================================
                      TRAINNER BOOKING COLLECTION   
 ========================================================================= */
+/* get method */
+app.get('/trainer-booking',async (req,res)=>{
+
+  const result= await trainerCollection.find().toArray()
+  res.send(result)
+})
+
+/* post method */
     app.post("/trainer-booking", async (req, res) => {
       const qury = req.body;
+      const totalBooking= qury.
       console.log(qury);
       const result = await trainerCollection.insertOne(qury);
       res.send(result);
