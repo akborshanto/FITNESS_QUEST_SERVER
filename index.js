@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 // This is your test secret API key.
 
@@ -10,7 +10,6 @@ app.use(cors());
 app.use(express.json());
 
 const stripe = require("stripe")(process.env.SECRET_STRIPE);
-
 
 /* stripe */
 /* ========================🚩🚩🚩=========================================
@@ -36,71 +35,78 @@ async function run() {
     /* COLLECTION */
     const userCollection = client.db("fitQuest").collection("user");
     const newsLetterCollection = client.db("fitQuest").collection("newsLetter");
-    const trainerCollection = client.db("fitQuest").collection("trainer-booking");
+    const trainerCollection = client
+      .db("fitQuest")
+      .collection("trainer-booking");
     const becomeTrainerCollection = client
       .db("fitQuest")
       .collection("become-trainer");
     /* USER CNF */
     const userCnCollection = client.db("fitQuest").collection("userCNF");
+    const forumCollection = client.db("fitQuest").collection("forum");
+    const ratingCollection = client.db("fitQuest").collection("rating");
     /* ========================🚩🚩🚩=========================================
                   STRIPE COLLECTION   
 ========================================================================= */
 
-app.post("/create-payment-intent", async (req, res) => {
-  const {price} = req.body;
-  console.log(price)
-  const amount= price * 100
-  console.log(amount)
+    app.post("/create-payment-intent", async (req, res) => {
+      const { price } = req.body;
+      console.log(price);
+      const amount = price * 100;
+      console.log(amount);
 
-  // Create a PaymentIntent with the order amount and currency
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: amount,
-    currency: "usd",
-    // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
-    automatic_payment_methods: {
-      enabled: true,
-    },
-    payment_method_types:['card']
-  });
+      // Create a PaymentIntent with the order amount and currency
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        payment_method_types: ["card"],
+      });
 
-  res.send({
-    clientSecret: paymentIntent.client_secret,
-  });
-});
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
 
+    /* ========================🚩🚩🚩=========================================
+                    RATINGNG_COLLECTION   
+========================================================================= */
+    /* get all ratin */
+    app.get("/rating", async (req, res) => {
+      const result = await ratingCollection.find().toArray();
+      res.send(result);
+    });
 
+    /* post method */
 
+    app.post("/rating", async (req, res) => {
+      const query = req.body;
 
-
-
-
-
-
+      const result = await ratingCollection.insertOne(query);
+      res.send(result);
+    });
 
     /* ========================🚩🚩🚩=========================================
                         USER COLLECTION   
 ========================================================================= */
 
-/* get email user */
-app.get('/userCn/:email',async(req,res)=>{
-const email=req.params.email;
-console.log(email)
-const result= await userCnCollection.findOne({email})
-res.send(result)
+    /* get email user */
+    app.get("/userCn/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const result = await userCnCollection.findOne({ email });
+      res.send(result);
+    });
 
+    /* get all userCn */
 
-})
-
-
-/* get all userCn */
-
-app.get('/userCn',async (req,res)=>{
-const result= await userCnCollection.find().toArray()
-res.send(result)
-
-
-})
-
+    app.get("/userCn", async (req, res) => {
+      const result = await userCnCollection.find().toArray();
+      res.send(result);
+    });
 
     /* USER CNF */
     app.put("/userCn", async (req, res) => {
@@ -110,7 +116,7 @@ res.send(result)
       if (isExist) {
         return res.send(isExist);
       }
-/* savae user firest time */
+      /* savae user firest time */
       const option = { upsert: true };
       const query = { email: user?.email };
       const updateDoc = {
@@ -121,6 +127,34 @@ res.send(result)
       };
 
       const result = await userCnCollection.updateOne(query, updateDoc, option);
+      res.send(result);
+    });
+
+    /* ========================🚩🚩🚩=========================================
+                    FORUM _COLLECTION   
+========================================================================= */
+
+    app.get("/forum", async (req, res) => {
+      const result = await forumCollection.find().toArray();
+
+      res.send(result);
+    });
+
+    /* get the singe data from FORUMCOLELCTION */
+    app.get("/forums/:id", async (req, res) => {
+      const id = req.params.id;
+console.log(id)
+      const query = { _id: new ObjectId(id) };
+      const result = await forumCollection.findOne(query);
+      console.log(result)
+      res.send(result);
+    });
+
+    /* post method */
+    app.post("/forum", async (req, res) => {
+      const query = req.body;
+
+      const result = await forumCollection.insertOne(query);
       res.send(result);
     });
 
@@ -143,21 +177,41 @@ res.send(result)
     /* ========================🚩🚩🚩=========================================
                      TRAINNER BOOKING COLLECTION   
 ========================================================================= */
-/* get method */
-app.get('/trainer-booking',async (req,res)=>{
-
-  const result= await trainerCollection.find().toArray()
-  res.send(result)
-})
-
-/* post method */
-    app.post("/trainer-booking", async (req, res) => {
-      const qury = req.body;
-      const totalBooking= qury.
-      console.log(qury);
-      const result = await trainerCollection.insertOne(qury);
+    /* get method */
+    app.get("/trainer-booking", async (req, res) => {
+      const result = await trainerCollection.find().toArray();
       res.send(result);
     });
+
+    /* post method */
+    app.post("/trainer-booking", async (req, res) => {
+      const qury = req.body;
+      console.log(qury);
+      const booking = { booking: new Date() };
+
+      // const inc = await trainerCollection.updateMany(
+      //   { _id: "booking" },
+      //   {
+      //     $inc: {
+      //       count: 1,
+      //     },
+      //   }
+      // );
+      const result = await trainerCollection.insertOne({ booking, qury });
+      console.log(result);
+
+      res.send(result);
+    });
+
+
+
+
+
+
+
+
+
+
     /* ========================🚩🚩🚩=========================================
                         BEOME TRAINER COLLECTION   
 ========================================================================= */
@@ -175,6 +229,32 @@ app.get('/trainer-booking',async (req,res)=>{
       const result = await becomeTrainerCollection.insertOne(becomeTrainer);
       res.send(result);
     });
+    /* ========================🚩🚩🚩=========================================
+                    All TRAINER _COLLECTION   
+========================================================================= */
+
+app.get('/trainer-detail/:id',async (req,res)=>{
+
+const id=req.params.id;
+console.log(id)
+const query={_id: new ObjectId(id)}
+
+const result=await becomeTrainerCollection.findOne(query)
+res.send(result)
+
+})
+
+
+
+
+
+
+
+
+
+    /* ========================🚩🚩🚩=========================================
+                 
+========================================================================= */
 
     await client.db("admin").command({ ping: 1 });
     console.log(
