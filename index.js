@@ -233,6 +233,40 @@ async function run() {
     });
 
     /* ========================🚩🚩🚩=========================================
+                 ADMIN DASHBOARD
+========================================================================= */
+    /* update role */
+    app.patch("/trainer-role/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      console.log(id)
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          role: "member",
+        },
+      };
+      console.log(updateDoc)
+
+const result=await becomeTrainerCollection.updateOne(query,updateDoc,option)
+console.log(result)
+res.send(result)
+
+
+    });
+
+    /* delete trainer */
+    app.delete("/delete-trainer/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = { _id: new ObjectId(id) };
+
+      const result = await becomeTrainerCollection.deleteOne(query);
+      console.log(result);
+      res.send(result);
+    });
+
+    /* ========================🚩🚩🚩=========================================
                  
 ========================================================================= */
 
