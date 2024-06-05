@@ -49,27 +49,27 @@ async function run() {
                   STRIPE COLLECTION   
 ========================================================================= */
 
-    app.post("/create-payment-intent", async (req, res) => {
-      const { price } = req.body;
-      console.log(price);
-      const amount = price * 100;
-      console.log(amount);
+    // app.post("/create-payment-intent", async (req, res) => {
+    //   const { price } = req.body;
+    //   console.log(price);
+    //   const amount = price * 100;
+    //   console.log(amount);
 
-      // Create a PaymentIntent with the order amount and currency
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount,
-        currency: "usd",
-        // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
-        automatic_payment_methods: {
-          enabled: true,
-        },
-        payment_method_types: ["card"],
-      });
+    //   // Create a PaymentIntent with the order amount and currency
+    //   const paymentIntent = await stripe.paymentIntents.create({
+    //     amount: amount,
+    //     currency: "usd",
+    //     // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
+    //     automatic_payment_methods: {
+    //       enabled: true,
+    //     },
+    //     payment_method_types: ["card"],
+    //   });
 
-      res.send({
-        clientSecret: paymentIntent.client_secret,
-      });
-    });
+    //   res.send({
+    //     clientSecret: paymentIntent.client_secret,
+    //   });
+    // });
 
     /* ========================🚩🚩🚩=========================================
                     RATINGNG_COLLECTION   
@@ -143,10 +143,10 @@ async function run() {
     /* get the singe data from FORUMCOLELCTION */
     app.get("/forums/:id", async (req, res) => {
       const id = req.params.id;
-console.log(id)
+      console.log(id);
       const query = { _id: new ObjectId(id) };
       const result = await forumCollection.findOne(query);
-      console.log(result)
+      console.log(result);
       res.send(result);
     });
 
@@ -187,7 +187,7 @@ console.log(id)
     app.post("/trainer-booking", async (req, res) => {
       const qury = req.body;
       console.log(qury);
-      const booking = { booking: new Date() };
+      // const booking = { booking: new Date() };
 
       // const inc = await trainerCollection.updateMany(
       //   { _id: "booking" },
@@ -197,20 +197,10 @@ console.log(id)
       //     },
       //   }
       // );
-      const result = await trainerCollection.insertOne({ booking, qury });
-      console.log(result);
+      const result = await trainerCollection.insertOne(qury);
 
       res.send(result);
     });
-
-
-
-
-
-
-
-
-
 
     /* ========================🚩🚩🚩=========================================
                         BEOME TRAINER COLLECTION   
@@ -233,24 +223,14 @@ console.log(id)
                     All TRAINER _COLLECTION   
 ========================================================================= */
 
-app.get('/trainer-detail/:id',async (req,res)=>{
+    app.get("/trainer-detail/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: new ObjectId(id) };
 
-const id=req.params.id;
-console.log(id)
-const query={_id: new ObjectId(id)}
-
-const result=await becomeTrainerCollection.findOne(query)
-res.send(result)
-
-})
-
-
-
-
-
-
-
-
+      const result = await becomeTrainerCollection.findOne(query);
+      res.send(result);
+    });
 
     /* ========================🚩🚩🚩=========================================
                  
