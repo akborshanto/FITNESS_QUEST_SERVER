@@ -45,6 +45,11 @@ async function run() {
     const userCnCollection = client.db("fitQuest").collection("userCNF");
     const forumCollection = client.db("fitQuest").collection("forum");
     const ratingCollection = client.db("fitQuest").collection("rating");
+    /* dashboard */
+
+    const addNewClassAdminCollection = client
+      .db("fitQuest")
+      .collection("addNewClassAdimin");
     /* ========================🚩🚩🚩=========================================
                   STRIPE COLLECTION   
 ========================================================================= */
@@ -111,14 +116,17 @@ async function run() {
     /* USER CNF */
     app.put("/userCn", async (req, res) => {
       const user = req.body;
+      console.log(user.role)
       /* if user is Exist */
       const isExist = userCnCollection.findOne({ email: user?.email });
-      if (isExist) {
-        return res.send(isExist);
-      }
+      if(isExist)return res.send(isExist)
+      // if (isExist) {
+      //   return res.send(isExist);
+      // }
       /* savae user firest time */
-      const option = { upsert: true };
+  
       const query = { email: user?.email };
+      const option = { upsert: true };
       const updateDoc = {
         $set: {
           ...user,
@@ -127,6 +135,7 @@ async function run() {
       };
 
       const result = await userCnCollection.updateOne(query, updateDoc, option);
+      console.log(result)
       res.send(result);
     });
 
@@ -155,6 +164,7 @@ async function run() {
       const query = req.body;
 
       const result = await forumCollection.insertOne(query);
+      console.log(result);
       res.send(result);
     });
 
@@ -205,7 +215,14 @@ async function run() {
     /* ========================🚩🚩🚩=========================================
                         BEOME TRAINER COLLECTION   
 ========================================================================= */
+app.get("/single-become-trainer/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  const query = { _id: new ObjectId(id) };
 
+  const result = await becomeTrainerCollection.findOne(query);
+  res.send(result);
+});
     /* get mehtod beacome a trainer */
     app.get("/become-trainer", async (req, res) => {
       const result = await becomeTrainerCollection.find().toArray();
@@ -235,23 +252,40 @@ async function run() {
     /* ========================🚩🚩🚩=========================================
                  ADMIN DASHBOARD
 ========================================================================= */
+
+    app.get("/addnewClassAdmin", async (req, res) => {
+      const result = await addNewClassAdminCollection.find().toArray();
+      res.send(result);
+    });
+
     /* update role */
     app.patch("/trainer-role/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      console.log(id)
+      console.log(id);
       const option = { upsert: true };
       const updateDoc = {
         $set: {
           role: "member",
         },
       };
-    
-const result=await becomeTrainerCollection.updateOne(query,updateDoc,option)
-console.log(result)
-res.send(result)
 
+      const result = await becomeTrainerCollection.updateOne(
+        query,
+        updateDoc,
+        option
+      );
+      console.log(result);
+      res.send(result);
+    });
 
+    /* add new classs */
+    app.post("/addnewClassAdmin", async (req, res) => {
+      const query = req.body;
+      console.log(query);
+      const result = await addNewClassAdminCollection.insertOne(query);
+      console.log(result);
+      res.send(result);
     });
 
     /* delete trainer */
@@ -265,13 +299,15 @@ res.send(result)
     //   res.send(result);
     // });
 
+    /* add */
+
     /* ========================🚩🚩🚩=========================================
                  
 ========================================================================= */
 
     await client.db("admin").command({ ping: 1 });
     console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
+      "Pinged your deploymensdft. You successfully connected to MongoDB!"
     );
   } finally {
     // Ensures that the client will close when you finish/error
