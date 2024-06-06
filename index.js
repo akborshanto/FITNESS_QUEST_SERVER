@@ -246,8 +246,7 @@ async function run() {
           role: "member",
         },
       };
-      console.log(updateDoc)
-
+    
 const result=await becomeTrainerCollection.updateOne(query,updateDoc,option)
 console.log(result)
 res.send(result)
@@ -256,15 +255,15 @@ res.send(result)
     });
 
     /* delete trainer */
-    app.delete("/delete-trainer/:id", async (req, res) => {
-      const id = req.params.id;
+    // app.delete("/delete-trainer/:id", async (req, res) => {
+    //   const id = req.params.id;
 
-      const query = { _id: new ObjectId(id) };
+    //   const query = { _id: new ObjectId(id) };
 
-      const result = await becomeTrainerCollection.deleteOne(query);
-      console.log(result);
-      res.send(result);
-    });
+    //   const result = await becomeTrainerCollection.deleteOne(query);
+    //   console.log(result);
+    //   res.send(result);
+    // });
 
     /* ========================🚩🚩🚩=========================================
                  
