@@ -116,15 +116,15 @@ async function run() {
     /* USER CNF */
     app.put("/userCn", async (req, res) => {
       const user = req.body;
-      console.log(user.role)
+      console.log(user.role);
       /* if user is Exist */
       const isExist = userCnCollection.findOne({ email: user?.email });
-      if(isExist)return res.send(isExist)
+      if (isExist) return res.send(isExist);
       // if (isExist) {
       //   return res.send(isExist);
       // }
       /* savae user firest time */
-  
+
       const query = { email: user?.email };
       const option = { upsert: true };
       const updateDoc = {
@@ -135,7 +135,7 @@ async function run() {
       };
 
       const result = await userCnCollection.updateOne(query, updateDoc, option);
-      console.log(result)
+      console.log(result);
       res.send(result);
     });
 
@@ -154,6 +154,7 @@ async function run() {
       const id = req.params.id;
       console.log(id);
       const query = { _id: new ObjectId(id) };
+      console.log(query)
       const result = await forumCollection.findOne(query);
       console.log(result);
       res.send(result);
@@ -187,6 +188,25 @@ async function run() {
     /* ========================🚩🚩🚩=========================================
                      TRAINNER BOOKING COLLECTION   
 ========================================================================= */
+
+    /* PROJECTION */
+    app.get("/projection", async (req, res) => {
+      const bookingDetails = await trainerCollection.find(
+        {},
+        {
+          projection: {
+     
+            slot:1,
+            role: 1,
+          },
+        }
+      ).toArray();
+      const bookingCount= await trainerCollection.countDocuments()
+
+      console.log(bookingDetails)
+      res.send({bookingDetails,bookingCount})
+    });
+
     /* get method */
     app.get("/trainer-booking", async (req, res) => {
       const result = await trainerCollection.find().toArray();
@@ -215,14 +235,23 @@ async function run() {
     /* ========================🚩🚩🚩=========================================
                         BEOME TRAINER COLLECTION   
 ========================================================================= */
-app.get("/single-become-trainer/:id", async (req, res) => {
-  const id = req.params.id;
-  console.log(id);
-  const query = { _id: new ObjectId(id) };
+    // app.get("/single-become-trainer/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   console.log(id);
+    //   const query = { _id: new ObjectId(id) };
 
-  const result = await becomeTrainerCollection.findOne(query);
-  res.send(result);
-});
+    //   const result = await becomeTrainerCollection.findOne(query);
+    //   console.log(result)
+    //   res.send(result);
+    // });
+
+    app.get("/trainerSingleData/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await becomeTrainerCollection.findOne(query);
+      res.send(result);
+    });
+
     /* get mehtod beacome a trainer */
     app.get("/become-trainer", async (req, res) => {
       const result = await becomeTrainerCollection.find().toArray();
