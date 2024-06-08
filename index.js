@@ -101,7 +101,7 @@ async function run() {
     /* get email user */
     app.get("/userCn/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email);
+
       const result = await userCnCollection.findOne({ email });
       res.send(result);
     });
@@ -152,9 +152,9 @@ async function run() {
     /* get the singe data from FORUMCOLELCTION */
     app.get("/forums/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
+
       const query = { _id: new ObjectId(id) };
-      console.log(query)
+      console.log(query);
       const result = await forumCollection.findOne(query);
       console.log(result);
       res.send(result);
@@ -191,20 +191,21 @@ async function run() {
 
     /* PROJECTION */
     app.get("/projection", async (req, res) => {
-      const bookingDetails = await trainerCollection.find(
-        {},
-        {
-          projection: {
-     
-            slot:1,
-            role: 1,
-          },
-        }
-      ).toArray();
-      const bookingCount= await trainerCollection.countDocuments()
+      const bookingDetails = await trainerCollection
+        .find(
+          {},
+          {
+            projection: {
+              slot: 1,
+              role: 1,
+            },
+          }
+        )
+        .toArray();
+      const bookingCount = await trainerCollection.countDocuments();
 
-      console.log(bookingDetails)
-      res.send({bookingDetails,bookingCount})
+      console.log(bookingDetails);
+      res.send({ bookingDetails, bookingCount });
     });
 
     /* get method */
@@ -245,12 +246,12 @@ async function run() {
     //   res.send(result);
     // });
 
-    app.get("/trainerSingleData/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await becomeTrainerCollection.findOne(query);
-      res.send(result);
-    });
+    // app.get("/trainerSingleData/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) };
+    //   const result = await becomeTrainerCollection.findOne(query);
+    //   res.send(result);
+    // });
 
     /* get mehtod beacome a trainer */
     app.get("/become-trainer", async (req, res) => {
@@ -269,44 +270,73 @@ async function run() {
                     All TRAINER _COLLECTION   
 ========================================================================= */
 
-    app.get("/trainer-detail/:id", async (req, res) => {
-      const id = req.params.id;
-      console.log(id);
-      const query = { _id: new ObjectId(id) };
+    // app.get("/trainer-detail/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   console.log(id);
+    //   const query = { _id: new ObjectId(id) };
 
-      const result = await becomeTrainerCollection.findOne(query);
-      res.send(result);
-    });
+    //   const result = await becomeTrainerCollection.findOne(query);
+    //   res.send(result);
+    // });
 
     /* ========================🚩🚩🚩=========================================
                  ADMIN DASHBOARD
 ========================================================================= */
 
+    /* UPDATE ROLE */
+    app.patch("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const user = req.body;
+
+      const query = { email };
+
+      const updateDoc = {
+        $set: {
+          ...user,
+        },
+      };
+
+      const result = await userCnCollection.updateOne(query, updateDoc);
+
+      res.send(result);
+    });
+
+    /* single trainer Data */
+    app.get("/singleTrainerData/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: new ObjectId(id) };
+      const result = await becomeTrainerCollection.findOne(query);
+      res.send(result);
+    });
+
+    /* add new collectiion */
     app.get("/addnewClassAdmin", async (req, res) => {
       const result = await addNewClassAdminCollection.find().toArray();
       res.send(result);
     });
 
     /* update role */
-    app.patch("/trainer-role/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      console.log(id);
-      const option = { upsert: true };
-      const updateDoc = {
-        $set: {
-          role: "member",
-        },
-      };
+    // app.patch("/trainer-role/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) };
+    //   console.log(id);
+    //   const option = { upsert: true };
+    //   const updateDoc = {
+    //     $set: {
+    //       role: "member",
+    //     },
+    //   };
 
-      const result = await becomeTrainerCollection.updateOne(
-        query,
-        updateDoc,
-        option
-      );
-      console.log(result);
-      res.send(result);
-    });
+    //   const result = await becomeTrainerCollection.updateOne(
+    //     query,
+    //     updateDoc,
+    //     option
+    //   );
+    //   console.log(result);
+    //   res.send(result);
+    // });
 
     /* add new classs */
     app.post("/addnewClassAdmin", async (req, res) => {
@@ -329,6 +359,28 @@ async function run() {
     // });
 
     /* add */
+    /* ========================🚩🚩🚩=========================================
+               TRAINERDASHBOARD
+========================================================================= */
+app.delete("/manageSlot/:id", async (req, res) => {
+  const id = req.params.id;
+console.log(id)
+  const query={_id: new ObjectId(id)}
+  const result = await trainerCollection.deleteOne(query);
+  res.send(result);
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
     /* ========================🚩🚩🚩=========================================
                  
