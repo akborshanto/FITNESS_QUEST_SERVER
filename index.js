@@ -50,6 +50,9 @@ async function run() {
     const addNewClassAdminCollection = client
       .db("fitQuest")
       .collection("addNewClassAdimin");
+    const addNewSlotTrainer = client
+      .db("fitQuest")
+      .collection("addNewSlotTrainer");
     /* ========================🚩🚩🚩=========================================
                   STRIPE COLLECTION   
 ========================================================================= */
@@ -98,6 +101,20 @@ async function run() {
                         USER COLLECTION   
 ========================================================================= */
 
+    app.post("/user-add", async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const query = { email: user.email };
+      const findUser = await userCnCollection.findOne(query);
+
+      if (findUser && findUser.email !== user.email) {
+        const result = await userCnCollection.insertOne(user);
+        res.send(result);
+      } else {
+        res.send("user already exist");
+      }
+    });
+
     /* get email user */
     app.get("/userCn/:email", async (req, res) => {
       const email = req.params.email;
@@ -114,9 +131,9 @@ async function run() {
     });
 
     /* USER CNF */
-    app.put("/userCn", async (req, res) => {
+    app.post("/userCn", async (req, res) => {
       const user = req.body;
-      console.log(user.role);
+
       /* if user is Exist */
       const isExist = userCnCollection.findOne({ email: user?.email });
       if (isExist) return res.send(isExist);
@@ -125,17 +142,13 @@ async function run() {
       // }
       /* savae user firest time */
 
-      const query = { email: user?.email };
-      const option = { upsert: true };
       const updateDoc = {
-        $set: {
-          ...user,
-          timestamp: Date.now(),
-        },
+        ...user,
+        timestamp: Date.now(),
       };
 
-      const result = await userCnCollection.updateOne(query, updateDoc, option);
-      console.log(result);
+      const result = await userCnCollection.insertOne(updateDoc);
+
       res.send(result);
     });
 
@@ -154,9 +167,9 @@ async function run() {
       const id = req.params.id;
 
       const query = { _id: new ObjectId(id) };
-      console.log(query);
+
       const result = await forumCollection.findOne(query);
-      console.log(result);
+      // console.log(result);
       res.send(result);
     });
 
@@ -165,7 +178,7 @@ async function run() {
       const query = req.body;
 
       const result = await forumCollection.insertOne(query);
-      console.log(result);
+      // console.log(result);
       res.send(result);
     });
 
@@ -217,17 +230,7 @@ async function run() {
     /* post method */
     app.post("/trainer-booking", async (req, res) => {
       const qury = req.body;
-      console.log(qury);
-      // const booking = { booking: new Date() };
 
-      // const inc = await trainerCollection.updateMany(
-      //   { _id: "booking" },
-      //   {
-      //     $inc: {
-      //       count: 1,
-      //     },
-      //   }
-      // );
       const result = await trainerCollection.insertOne(qury);
 
       res.send(result);
@@ -236,22 +239,6 @@ async function run() {
     /* ========================🚩🚩🚩=========================================
                         BEOME TRAINER COLLECTION   
 ========================================================================= */
-    // app.get("/single-become-trainer/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   console.log(id);
-    //   const query = { _id: new ObjectId(id) };
-
-    //   const result = await becomeTrainerCollection.findOne(query);
-    //   console.log(result)
-    //   res.send(result);
-    // });
-
-    // app.get("/trainerSingleData/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: new ObjectId(id) };
-    //   const result = await becomeTrainerCollection.findOne(query);
-    //   res.send(result);
-    // });
 
     /* get mehtod beacome a trainer */
     app.get("/become-trainer", async (req, res) => {
@@ -270,15 +257,6 @@ async function run() {
                     All TRAINER _COLLECTION   
 ========================================================================= */
 
-    // app.get("/trainer-detail/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   console.log(id);
-    //   const query = { _id: new ObjectId(id) };
-
-    //   const result = await becomeTrainerCollection.findOne(query);
-    //   res.send(result);
-    // });
-
     /* ========================🚩🚩🚩=========================================
                  ADMIN DASHBOARD
 ========================================================================= */
@@ -288,7 +266,7 @@ async function run() {
       const email = req.params.email;
       console.log(email);
       const user = req.body;
-
+      console.log(user);
       const query = { email };
 
       const updateDoc = {
@@ -317,27 +295,6 @@ async function run() {
       res.send(result);
     });
 
-    /* update role */
-    // app.patch("/trainer-role/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: new ObjectId(id) };
-    //   console.log(id);
-    //   const option = { upsert: true };
-    //   const updateDoc = {
-    //     $set: {
-    //       role: "member",
-    //     },
-    //   };
-
-    //   const result = await becomeTrainerCollection.updateOne(
-    //     query,
-    //     updateDoc,
-    //     option
-    //   );
-    //   console.log(result);
-    //   res.send(result);
-    // });
-
     /* add new classs */
     app.post("/addnewClassAdmin", async (req, res) => {
       const query = req.body;
@@ -347,26 +304,17 @@ async function run() {
       res.send(result);
     });
 
-    /* delete trainer */
-    // app.delete("/delete-trainer/:id", async (req, res) => {
-    //   const id = req.params.id;
-
-    //   const query = { _id: new ObjectId(id) };
-
-    //   const result = await becomeTrainerCollection.deleteOne(query);
-    //   console.log(result);
-    //   res.send(result);
-    // });
-
     /* add */
     /* ========================🚩🚩🚩=========================================
                TRAINERDASHBOARD
 ========================================================================= */
-app.delete("/manageSlot/:id", async (req, res) => {
-  const id = req.params.id;
-console.log(id)
-  const query={_id: new ObjectId(id)}
-  const result = await trainerCollection.deleteOne(query);
+
+
+app.post("/add-NewSlot-Trainer", async (req, res) => {
+  const query = req.body;
+  console.log(query);
+  const result = await addNewSlotTrainer.insertOne(query);
+  console.log(result);
   res.send(result);
 });
 
@@ -377,10 +325,24 @@ console.log(id)
 
 
 
+    app.get("/addNewSlotTrainer/:email", async (req, res) => {
+      const email = req.params.email;
+ 
+const query={'email':email}
 
+      // const query = { 'email': email };
+      const result = await becomeTrainerCollection.find(query).toArray();
+      res.send(result)
+    });
 
+    /* delete trainer */
+    app.delete("/manageSlot/:id", async (req, res) => {
+      const id = req.params.id;
 
-
+      const query = { _id: new ObjectId(id) };
+      const result = await trainerCollection.deleteOne(query);
+      res.send(result);
+    });
 
     /* ========================🚩🚩🚩=========================================
                  
