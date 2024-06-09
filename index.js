@@ -156,8 +156,33 @@ async function run() {
                     FORUM _COLLECTION   
 ========================================================================= */
 
+
+
+
+
+
+/* pagination */
+
+app.get('/all-forum-count',async(req,res)=>{
+  const count=await forumCollection.estimatedDocumentCount()
+  res.send({count})
+})
+
+
+
+
+/*  */
     app.get("/forum", async (req, res) => {
-      const result = await forumCollection.find().toArray();
+
+      const page=parseInt(req.query.page)
+      const size=parseInt(req.query.size)
+     // console.log(req.query)
+      const result = await forumCollection.find()
+  
+      .skip(page * size)
+      .limit(size)
+      .toArray()
+      ;
 
       res.send(result);
     });
@@ -249,7 +274,7 @@ async function run() {
     /* post method become a trainer */
     app.post("/become-trainer", async (req, res) => {
       const becomeTrainer = req.body;
-      console.log(becomeTrainer);
+
       const result = await becomeTrainerCollection.insertOne(becomeTrainer);
       res.send(result);
     });
@@ -289,10 +314,29 @@ async function run() {
       res.send(result);
     });
 
+
+
+/* pagination */
+app.get("/addNewClassAdmins",async(req,res)=>{
+
+const count= await addNewClassAdminCollection.estimatedDocumentCount()
+res.send({count})
+
+})
+
+
     /* add new collectiion */
     app.get("/addnewClassAdmin", async (req, res) => {
-      const result = await addNewClassAdminCollection.find().toArray();
-      res.send(result);
+      const page=parseInt(req.query.page)
+      const size=parseInt(req.query.size)
+ 
+      const result = await addNewClassAdminCollection.find()
+  
+      .skip(page * size)
+      .limit(size)
+      .toArray()
+      
+      res.send(result)
     });
 
     /* add new classs */
