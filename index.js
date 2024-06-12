@@ -8,12 +8,20 @@ const stripe = require("stripe")(process.env.SECRET_STRIPE);
 
 const port = process.env.PORT || 5000;
 const app = express();
-app.use(
-  cors({
-    origin: ["*", "http://localhost:5173", " https://trainer-quet.web.app"],
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//   // origin: ["*", "http://localhost:5173", " https://trainer-quet.web.app"],
+//     credentials: true,
+//   })
+// );
+
+const corsOptions = {
+  origin: ["http://localhost:5173"],
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 /* stripe */
@@ -38,21 +46,24 @@ async function run() {
     // await client.connect();
     // Send a ping to confirm a successful
     /* COLLECTION */
-   // const userCollection = client.db("fitQuest").collection("user");
+    // const userCollection = client.db("fitQuest").collection("user");
     const newsLetterCollection = client.db("fitQuest").collection("newsLetter");
     const trainerCollection = client
       .db("fitQuest")
       .collection("trainer-booking");
     const becomeTrainerCollection = client
       .db("fitQuest")
-      .collection("all-trainer");
+      .collection("become-trainer");
     /* USER CNF */
-    const userCnCollection = client.db("fitQuest").collection("userCNF");
+    // const userCnCollection = client.db("fitQuest").collection("userCNF");
     //const fordumCollection = client.db("fitQuest").collection("add-new-forum");
-  const forumCollection = client.db("fitQuest").collection("forum");
+    const forumCollection = client.db("fitQuest").collection("forum");
     const ratingCollection = client.db("fitQuest").collection("rating");
     const roleCollection = client.db("fitQuest").collection("role");
     const paymentCollection = client.db("fitQuest").collection("payment");
+    const adminFeedbackCollection = client
+      .db("fitQuest")
+      .collection("admin-feedback");
 
     /* dashboard */
 
@@ -82,29 +93,25 @@ async function run() {
         // },
         payment_method_types: ["card"],
       });
-console.log({paymentIntent})
+      console.log({ paymentIntent });
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
     });
 
-    app.get('/payment-card',async(req,res)=>{
+    app.get("/payment-card", async (req, res) => {
+      const payment = req.body;
 
-      const payment=req.body;
+      const paymentResult = await paymentCollection.find().toArray();
+      res.send(paymentResult);
+    });
 
-      const paymentResult=await paymentCollection.find().toArray()
-      res.send(paymentResult)
-      
-          })
-
-    app.post('/payment-card',async(req,res)=>{
-
-const payment=req.body;
-console.log(payment)
-const paymentResult=await paymentCollection.insertOne(payment)
-res.send(paymentResult)
-
-    })
+    app.post("/payment-card", async (req, res) => {
+      const payment = req.body;
+      console.log(payment);
+      const paymentResult = await paymentCollection.insertOne(payment);
+      res.send(paymentResult);
+    });
     /* ========================🚩🚩🚩=========================================
                     RATINGNG_COLLECTION
 ========================================================================= */
@@ -126,12 +133,12 @@ res.send(paymentResult)
     /* ========================🚩🚩🚩=========================================
                         ZONKAR COLLECTION
 ========================================================================= */
-app.get("/moduleUser/:email", async (req, res) => {
-  const email = req.params.email;
-console.log(email)
-  const result = await roleCollection.findOne({ email });
-  res.send(result);
-});
+    app.get("/moduleUser/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const result = await roleCollection.findOne({ email });
+      res.send(result);
+    });
     app.post("/moduleUser", async (req, res) => {
       const user = req.body;
 
@@ -149,21 +156,6 @@ console.log(email)
     /* ========================🚩🚩🚩=========================================
                         CONCEPTET COLLECTION
 ========================================================================= */
-
-    // app.post("/user-add", async (req, res) => {
-    //   const user = req.body;
-    //   console.log(user);
-    //   const query = { email: user.email };
-    //   const findUser = await moduleCollection.findOne(query);
-
-    //   if (findUser && findUser.email !== user.email) {
-    //     const result = await moduleCollection.insertOne(user);
-    //     res.send(result);
-    //   } else {
-    //     res.send("user already exist");
-    //   }
-    // });
-
     /* get email user */
     app.get("/userCn/:email", async (req, res) => {
       const email = req.params.email;
@@ -173,33 +165,6 @@ console.log(email)
     });
 
     /* get all userCn */
-
-    app.get("/userCn", async (req, res) => {
-      const result = await userCnCollection.find().toArray();
-      res.send(result);
-    });
-
-    /* USER CNF */
-    app.post("/userCn", async (req, res) => {
-      const user = req.body;
-
-      /* if user is Exist */
-      const isExist = userCnCollection.findOne({ email: user?.email });
-      if (isExist) return res.send(isExist);
-      // if (isExist) {
-      //   return res.send(isExist);
-      // }
-      /* savae user firest time */
-
-      const updateDoc = {
-        ...user,
-        timestamp: Date.now(),
-      };
-
-      const result = await userCnCollection.insertOne(updateDoc);
-
-      res.send(result);
-    });
 
     /* ========================🚩🚩🚩=========================================
                     FORUM _COLLECTION
@@ -266,7 +231,6 @@ console.log(email)
                      TRAINNER BOOKING COLLECTION
 ========================================================================= */
 
-
     /* PROJECTION */
     app.get("/projection", async (req, res) => {
       const bookingDetails = await trainerCollection
@@ -304,6 +268,23 @@ console.log(email)
     /* ========================🚩🚩🚩=========================================
                         BEOME TRAINER COLLECTION
 ========================================================================= */
+
+    // app.patch('/feedback/:dd',async(req,res)=>{
+    //   const id=req.params.dd;
+    //   const feedback=req.body;
+    //   console.log(feedback)
+    //   const query={_id: id}
+    //   const option={upsert:true}
+    //   const updateDoc={
+    //     ...feedback
+    //   }
+
+    //   const result=await becomeTrainerCollection.updateOne(query,updateDoc,option)
+    //   console.log(result)
+    //   res.send(result)
+
+    //   })
+
     app.get("/trainer-single-detail/:id", async (req, res) => {
       const id = req.params.id;
       console.log(id);
@@ -329,25 +310,21 @@ console.log(email)
     /* ========================🚩🚩🚩=========================================
                  ADMIN DASHBOARD
 ========================================================================= */
-/* role collection */
-app.patch('/role/admin/:email',async(req,res)=>{
-  const id=req.params.id;
-  console.log(id)
-  const filter={_id: new ObjectId(id)}
-  console.log(filter)
-  const updateDoc={
-    $set:{
-      role:'trainer'
-    }
-  }
-  
-  
-  const result=await roleCollection.updateOne(filter,updateDoc)
-  res.send(result)
-  
-  
-  })
-  
+
+    /* role collection */
+    app.patch("/role/admin/:email", async (req, res) => {
+      const email = req.params.email;
+
+      const updateDoc = {
+        $set: {
+          role: "trainer",
+        },
+      };
+
+      const result = await roleCollection.updateOne({ email }, updateDoc);
+      res.send(result);
+    });
+
     /* UPDATE ROLE */
     // app.patch("/user/:email", async (req, res) => {
     //   const email = req.params.email;
@@ -419,15 +396,15 @@ app.patch('/role/admin/:email',async(req,res)=>{
       res.send(result);
     });
 
-    // app.get("/addNewSlotTrainer/:email", async (req, res) => {
-    //   const email = req.params.email;
+    app.get("/addNewSlotTrainer/:email", async (req, res) => {
+      const email = req.params.email;
 
-    //   const query = { email: email };
+      const query = { email: email };
 
-    //   // const query = { 'email': email };
-    //   const result = await becomeTrainerCollection.find(query).toArray();
-    //   res.send(result);
-    // });
+      // const query = { 'email': email };
+      const result = await becomeTrainerCollection.find(query).toArray();
+      res.send(result);
+    });
 
     /* delete trainer */
     app.delete("/manageSlot/:id", async (req, res) => {
