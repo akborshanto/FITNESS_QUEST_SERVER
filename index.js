@@ -232,23 +232,23 @@ async function run() {
 ========================================================================= */
 
     /* PROJECTION */
-    app.get("/projection", async (req, res) => {
-      const bookingDetails = await trainerCollection
-        .find(
-          {},
-          {
-            projection: {
-              slot: 1,
-              role: 1,
-            },
-          }
-        )
-        .toArray();
-      const bookingCount = await trainerCollection.countDocuments();
+    // app.get("/projection", async (req, res) => {
+    //   const bookingDetails = await trainerCollection
+    //     .find(
+    //       {},
+    //       {
+    //         projection: {
+    //           slot: 1,
+    //           role: 1,
+    //         },
+    //       }
+    //     )
+    //     .toArray();
+    //   const bookingCount = await trainerCollection.countDocuments();
 
-      console.log(bookingDetails);
-      res.send({ bookingDetails, bookingCount });
-    });
+    //   console.log(bookingDetails);
+    //   res.send({ bookingDetails, bookingCount });
+    // });
 
     /* get method */
     app.get("/trainer-booking", async (req, res) => {
@@ -414,6 +414,24 @@ async function run() {
       const result = await trainerCollection.deleteOne(query);
       res.send(result);
     });
+
+    /* ========================🚩🚩🚩=========================================
+                       MEMBER
+========================================================================= */
+
+app.get("/bookTrainer/:email", async (req, res) => {
+  const email = req.params.email;
+  console.log(email,"EMAIL")
+  const query = { 'userInfo.userEmail': email };
+
+  // const query = { 'email': email };
+  const result = await trainerCollection.find(query).toArray();
+
+  res.send(result);
+});
+
+
+
 
     /* ========================🚩🚩🚩=========================================
 
