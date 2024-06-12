@@ -38,7 +38,7 @@ async function run() {
     // await client.connect();
     // Send a ping to confirm a successful
     /* COLLECTION */
-    const userCollection = client.db("fitQuest").collection("user");
+   // const userCollection = client.db("fitQuest").collection("user");
     const newsLetterCollection = client.db("fitQuest").collection("newsLetter");
     const trainerCollection = client
       .db("fitQuest")
@@ -48,9 +48,11 @@ async function run() {
       .collection("all-trainer");
     /* USER CNF */
     const userCnCollection = client.db("fitQuest").collection("userCNF");
-    const forumCollection = client.db("fitQuest").collection("forum");
+    //const fordumCollection = client.db("fitQuest").collection("add-new-forum");
+  const forumCollection = client.db("fitQuest").collection("forum");
     const ratingCollection = client.db("fitQuest").collection("rating");
     const roleCollection = client.db("fitQuest").collection("role");
+    const paymentCollection = client.db("fitQuest").collection("payment");
 
     /* dashboard */
 
@@ -86,6 +88,23 @@ console.log({paymentIntent})
       });
     });
 
+    app.get('/payment-card',async(req,res)=>{
+
+      const payment=req.body;
+
+      const paymentResult=await paymentCollection.find().toArray()
+      res.send(paymentResult)
+      
+          })
+
+    app.post('/payment-card',async(req,res)=>{
+
+const payment=req.body;
+console.log(payment)
+const paymentResult=await paymentCollection.insertOne(payment)
+res.send(paymentResult)
+
+    })
     /* ========================🚩🚩🚩=========================================
                     RATINGNG_COLLECTION
 ========================================================================= */
@@ -247,6 +266,7 @@ console.log(email)
                      TRAINNER BOOKING COLLECTION
 ========================================================================= */
 
+
     /* PROJECTION */
     app.get("/projection", async (req, res) => {
       const bookingDetails = await trainerCollection
@@ -284,7 +304,6 @@ console.log(email)
     /* ========================🚩🚩🚩=========================================
                         BEOME TRAINER COLLECTION
 ========================================================================= */
-
     app.get("/trainer-single-detail/:id", async (req, res) => {
       const id = req.params.id;
       console.log(id);
@@ -306,32 +325,47 @@ console.log(email)
       const result = await becomeTrainerCollection.insertOne(becomeTrainer);
       res.send(result);
     });
-    /* ========================🚩🚩🚩=========================================
-                    All TRAINER _COLLECTION
-========================================================================= */
 
     /* ========================🚩🚩🚩=========================================
                  ADMIN DASHBOARD
 ========================================================================= */
-
+/* role collection */
+app.patch('/role/admin/:email',async(req,res)=>{
+  const id=req.params.id;
+  console.log(id)
+  const filter={_id: new ObjectId(id)}
+  console.log(filter)
+  const updateDoc={
+    $set:{
+      role:'trainer'
+    }
+  }
+  
+  
+  const result=await roleCollection.updateOne(filter,updateDoc)
+  res.send(result)
+  
+  
+  })
+  
     /* UPDATE ROLE */
-    app.patch("/user/:email", async (req, res) => {
-      const email = req.params.email;
-      console.log(email);
-      const user = req.body;
-      console.log(user);
-      const query = { email };
+    // app.patch("/user/:email", async (req, res) => {
+    //   const email = req.params.email;
+    //   console.log(email);
+    //   const user = req.body;
+    //   console.log(user);
+    //   const query = { email };
 
-      const updateDoc = {
-        $set: {
-          ...user,
-        },
-      };
+    //   const updateDoc = {
+    //     $set: {
+    //       ...user,
+    //     },
+    //   };
 
-      const result = await userCnCollection.updateOne(query, updateDoc);
+    //   const result = await userCnCollection.updateOne(query, updateDoc);
 
-      res.send(result);
-    });
+    //   res.send(result);
+    // });
 
     /* single trainer Data */
     app.get("/singleTrainerData/:id", async (req, res) => {
@@ -385,15 +419,15 @@ console.log(email)
       res.send(result);
     });
 
-    app.get("/addNewSlotTrainer/:email", async (req, res) => {
-      const email = req.params.email;
+    // app.get("/addNewSlotTrainer/:email", async (req, res) => {
+    //   const email = req.params.email;
 
-      const query = { email: email };
+    //   const query = { email: email };
 
-      // const query = { 'email': email };
-      const result = await becomeTrainerCollection.find(query).toArray();
-      res.send(result);
-    });
+    //   // const query = { 'email': email };
+    //   const result = await becomeTrainerCollection.find(query).toArray();
+    //   res.send(result);
+    // });
 
     /* delete trainer */
     app.delete("/manageSlot/:id", async (req, res) => {
