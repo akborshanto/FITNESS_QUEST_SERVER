@@ -73,6 +73,53 @@ async function run() {
     const addNewSlotTrainer = client
       .db("fitQuest")
       .collection("addNewSlotTrainer");
+
+      /*  */
+    const ALL_TRAINERCollection = client
+      .db("fitQuest")
+      .collection("ALL_TRAINER");
+
+    /* ========================🚩🚩🚩=========================================
+                        PRACTICE COLLECTION
+========================================================================= */
+    
+// app.get('/project',async (req,res)=>{
+// console.log(req.body)
+// const result=await trainerCollection.aggregate([
+// {$project:{
+
+//   totalBooking:{},
+//   intPrice:1,
+//   classs:1,
+//   userInfo:1
+
+// }}
+
+// ]).toArray()
+// res.send(result)
+
+
+
+// })
+
+
+
+
+
+
+/* fget all rolll */
+
+
+
+
+
+
+
+
+
+
+
+
     /* ========================🚩🚩🚩=========================================
                   STRIPE COLLECTION
 ========================================================================= */
@@ -153,18 +200,6 @@ async function run() {
       res.send(result);
     });
 
-    /* ========================🚩🚩🚩=========================================
-                        CONCEPTET COLLECTION
-========================================================================= */
-    /* get email user */
-    app.get("/userCn/:email", async (req, res) => {
-      const email = req.params.email;
-
-      const result = await userCnCollection.findOne({ email });
-      res.send(result);
-    });
-
-    /* get all userCn */
 
     /* ========================🚩🚩🚩=========================================
                     FORUM _COLLECTION
@@ -310,6 +345,21 @@ async function run() {
     /* ========================🚩🚩🚩=========================================
                  ADMIN DASHBOARD
 ========================================================================= */
+app.get("/allTr",async(req,res)=>{
+
+
+  const result=await ALL_TRAINERCollection.find().toArray() || {}
+  res.send(result)
+})
+
+app.post("/allTr",async(req,res)=>{
+
+  const ALL_TRAINER=req.body;
+  console.log(ALL_TRAINER)
+  const result=await ALL_TRAINERCollection.insertOne(ALL_TRAINER)
+  res.send(result)
+})
+
 
     /* role collection */
     app.patch("/role/admin/:email", async (req, res) => {
