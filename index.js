@@ -113,9 +113,9 @@ app.post('/fitness/userFitness', async (req, res) => {
 app.post('/fitness/forumFitness', async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
+    
     const result = await forumFitness.insertOne(data);
-    console.log(result)
+
     res.send(result);
   } catch (error) {
     console.error(error);
@@ -124,10 +124,23 @@ app.post('/fitness/forumFitness', async (req, res) => {
 });
 
 
+app.get('/users/role/:email', async (req, res) => {
+  const email = req.params.email;
+  console.log(email,"DSFDSds")
+  const query = { email: email };
+  const user = await userCollect.findOne(query);
 
-
-
-
+  if (!user) {
+    return res.status(404).send({ message: "User not found" });
+  }
+  if (user.role === "admin") {
+    return res.send({ role: 'admin' });
+  }
+  if (user.role === "trainer") {
+    return res.send({ role: 'trainer' });
+  }
+  return res.send({ role: "user" });
+});
 
 
 
