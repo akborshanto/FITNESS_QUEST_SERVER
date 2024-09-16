@@ -8,12 +8,6 @@ const stripe = require("stripe")(process.env.SECRET_STRIPE);
 
 const port = process.env.PORT || 5000;
 const app = express();
-// app.use(
-//   cors({
-//   // origin: ["*", "http://localhost:5173", " https://trainer-quet.web.app"],
-//     credentials: true,
-//   })
-// );
 
 const corsOptions = {
   origin: ["http://localhost:5173"],
@@ -42,9 +36,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
-    // Send a ping to confirm a successful
+
     /* COLLECTION */
     // const userCollection = client.db("fitQuest").collection("user");
     const newsLetterCollection = client.db("fitQuest").collection("newsLetter");
@@ -79,47 +71,69 @@ async function run() {
       .db("fitQuest")
       .collection("ALL_TRAINER");
 
-    /* ========================🚩🚩🚩=========================================
-                        PRACTICE COLLECTION
-========================================================================= */
-    
-// app.get('/project',async (req,res)=>{
-// console.log(req.body)
-// const result=await trainerCollection.aggregate([
-// {$project:{
+      /* ======UPDATE==== */
+    const Trainer = client
+      .db("fitQuest")
+      .collection("trainer");
+    const userCollect = client
+      .db("fitQuest")
+      .collection("userFitness");
+    const newsLetter = client
+      .db("fitQuest")
+      .collection("newsLetterFitness");
+    const forumFitness = client
+      .db("fitQuest")
+      .collection("forumFitness");
 
-//   totalBooking:{},
-//   intPrice:1,
-//   classs:1,
-//   userInfo:1
-
-// }}
-
-// ]).toArray()
-// res.send(result)
+/* ============================================================================================================ */
 
 
+{/* all trainer */}
+app.post('/fitness/trainer',async(req,res)=>{
 
-// })
+  const trainer = req.body;
+
+  const result = await Trainer.insertOne(trainer);
+  res.send(result);
+
+})
+/* user Trainer */
+app.post('/fitness/userFitness', async (req, res) => {
+  try {
+    const data = req.body;
+    //console.log(data);
+    const result = await userCollect.insertOne(data);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('An error occurred');
+  }
+});
+{/* DASHBOAD FORUM */}
+app.post('/fitness/forumFitness', async (req, res) => {
+  try {
+    const data = req.body;
+    console.log(data);
+    const result = await forumFitness.insertOne(data);
+    console.log(result)
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('An error occurred');
+  }
+});
 
 
 
 
 
 
-/* fget all rolll */
 
 
 
 
 
-
-
-
-
-
-
-
+/* ======================================================================== */
     /* ========================🚩🚩🚩=========================================
                   STRIPE COLLECTION
 ========================================================================= */
@@ -266,25 +280,6 @@ async function run() {
                      TRAINNER BOOKING COLLECTION
 ========================================================================= */
 
-    /* PROJECTION */
-    // app.get("/projection", async (req, res) => {
-    //   const bookingDetails = await trainerCollection
-    //     .find(
-    //       {},
-    //       {
-    //         projection: {
-    //           slot: 1,
-    //           role: 1,
-    //         },
-    //       }
-    //     )
-    //     .toArray();
-    //   const bookingCount = await trainerCollection.countDocuments();
-
-    //   console.log(bookingDetails);
-    //   res.send({ bookingDetails, bookingCount });
-    // });
-
     /* get method */
     app.get("/trainer-booking", async (req, res) => {
       const result = await trainerCollection.find().toArray();
@@ -304,21 +299,6 @@ async function run() {
                         BEOME TRAINER COLLECTION
 ========================================================================= */
 
-    // app.patch('/feedback/:dd',async(req,res)=>{
-    //   const id=req.params.dd;
-    //   const feedback=req.body;
-    //   console.log(feedback)
-    //   const query={_id: id}
-    //   const option={upsert:true}
-    //   const updateDoc={
-    //     ...feedback
-    //   }
-
-    //   const result=await becomeTrainerCollection.updateOne(query,updateDoc,option)
-    //   console.log(result)
-    //   res.send(result)
-
-    //   })
 
     app.get("/trainer-single-detail/:id", async (req, res) => {
       const id = req.params.id;
@@ -375,24 +355,7 @@ app.post("/allTr",async(req,res)=>{
       res.send(result);
     });
 
-    /* UPDATE ROLE */
-    // app.patch("/user/:email", async (req, res) => {
-    //   const email = req.params.email;
-    //   console.log(email);
-    //   const user = req.body;
-    //   console.log(user);
-    //   const query = { email };
 
-    //   const updateDoc = {
-    //     $set: {
-    //       ...user,
-    //     },
-    //   };
-
-    //   const result = await userCnCollection.updateOne(query, updateDoc);
-
-    //   res.send(result);
-    // });
 
     /* single trainer Data */
     app.get("/singleTrainerData/:id", async (req, res) => {
