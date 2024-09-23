@@ -79,6 +79,7 @@ async function run() {
     const classFitness = client.db("fitQuest").collection("classFitness");
     const pendingTrainer = client.db("fitQuest").collection("pendingTrainer");
     const Subscriber = client.db("fitQuest").collection("subscriberFitness");
+    const newClassFroum = client.db("fitQuest").collection("newClassFroum");
     /* ============================================================================================================ */
 
     {
@@ -92,8 +93,17 @@ async function run() {
     });
 
     app.get("/fitness/allTrainer", async (req, res) => {
+      const result = await userCollect.find().toArray();
+      res.send(result);
+    });
+    {
+      /* delete */
+    }
+    app.delete("/fitness/allTrainer/:email", async (req, res) => {
+      const email = req.params.email;
+const query={email:email}
+      const result = await userCollect.deleteOne(query);
 
-      const result = await userCollect.find().toArray()
       res.send(result);
     });
     /* user Trainer */
@@ -205,18 +215,27 @@ async function run() {
       const updateRole = await userCollect.updateOne(findUser, update);
       const result = await pendingTrainer.deleteOne(query);
 
-  console.log(result)
+      console.log(result);
       res.send(result);
     });
     app.delete(`/applictionBecameTrainerDelete/:id`, async (req, res) => {
       const id = req.params.id;
 
-      const result = await pendingTrainer.deleteOne({_id:new ObjectId(id)});
+      const result = await pendingTrainer.deleteOne({ _id: new ObjectId(id) });
 
-     console.log(result)
+      console.log(result);
       res.send(result);
     });
 
+
+{/* forum */}
+app.post("/fitness/newClass-forum", async (req, res) => {
+  const trainer = req.body;
+
+  const result = await newClassFroum.insertOne(trainer);
+ 
+  res.send(result);
+});
     {
       /* subscriber */
     }
