@@ -106,7 +106,7 @@ async function run() {
     }
     app.delete("/fitness/allTrainer/:email", async (req, res) => {
       const email = req.params.email;
-const query={email:email}
+      const query = { email: email };
       const result = await userCollect.deleteOne(query);
 
       res.send(result);
@@ -138,7 +138,10 @@ const query={email:email}
         res.status(500).send("An error occurred");
       }
     });
-
+    app.get("/fitness/forumFitness", async (req, res) => {
+      const result = await forumFitness.find().toArray();
+      res.send(result);
+    });
     app.get("/users/role/:email", async (req, res) => {
       const email = req.params.email;
       //console.log(email, "DSFDSds");
@@ -197,9 +200,51 @@ const query={email:email}
         res.status(500).send({ message: "An error occurred" });
       }
     });
+    app.get("/fitness/pending-single-trainers/:email", async (req, res) => {
+      const email = req.params.email;
+ 
+      try {
+        // Construct the query to find the document by its ID
+        const query = { email: email };
+
+        // Retrieve the specific pending trainer document
+        const result = await userCollect.findOne(query);
+
+        // Send the result back to the client
+        if (result) {
+          res.send(result);
+        } else {
+          res.status(404).send({ message: "Trainer not found" });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "An error occurred" });
+      }
+    });
+    app.delete("/fitness/pending-single-trainersDeletee/:email", async (req, res) => {
+      const email = req.params.email;
+
+      try {
+        // Construct the query to find the document by its ID
+        const query = { email: email };
+
+        // Retrieve the specific pending trainer document
+        const result = await userCollect.deleteOne(query);
+
+        // Send the result back to the client
+        if (result) {
+          res.send(result);
+        } else {
+          res.status(404).send({ message: "Trainer not found" });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "An error occurred" });
+      }
+    });
 
     {
-      /*dashboard  */
+      /*dashboard  admin */
     }
 
     app.post("/applictionBecameTrainerUpdata/:id", async (req, res) => {
@@ -218,30 +263,23 @@ const query={email:email}
         },
       };
       const updateRole = await userCollect.updateOne(findUser, update);
-      const makeTrainer=await Trainer.insertOne(trainerInfo)
+      const makeTrainer = await Trainer.insertOne(trainerInfo);
       const result = await pendingTrainer.deleteOne(query);
 
       //console.log(result);
       res.send(result);
     });
-    app.delete(`/applictionBecameTrainerDelete/:id`, async (req, res) => {
-      const id = req.params.id;
 
-      const result = await pendingTrainer.deleteOne({ _id: new ObjectId(id) });
+    {
+      /* forum */
+    }
+    app.post("/fitness/newClass-forum", async (req, res) => {
+      const trainer = req.body;
 
-      //console.log(result);
+      const result = await newClassFroum.insertOne(trainer);
+
       res.send(result);
     });
-
-
-{/* forum */}
-app.post("/fitness/newClass-forum", async (req, res) => {
-  const trainer = req.body;
-
-  const result = await newClassFroum.insertOne(trainer);
- 
-  res.send(result);
-});
     {
       /* subscriber */
     }
@@ -257,21 +295,41 @@ app.post("/fitness/newClass-forum", async (req, res) => {
       res.send(result);
     });
 
-    {/* dashboard trainer */}
+    {
+      /* dashboard trainer */
+    }
     app.get("/fitness/booked-trainser/:email", async (req, res) => {
-      const email=req.params.email;
-const querys={email:email}
+      const email = req.params.email;
+      const querys = { email: email };
 
-const result=await Trainer.findOne(querys)
+      const result = await Trainer.findOne(querys);
 
-      
-           // const result = await Trainer.find().toArray();
-            res.send(result);
-          });
-          app.get("/fitness/allTrainerNew", async (req, res) => {
-            const result = await Trainer.find().toArray();
-            res.send(result);
-          });
+      // const result = await Trainer.find().toArray();
+      res.send(result);
+    });
+    app.get("/fitness/allTrainerNew", async (req, res) => {
+      const result = await Trainer.find().toArray();
+      res.send(result);
+    });
+    app.delete(`/fitness/allTrainerNewDelete/:email`, async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const query = { email: email };
+      const result = await Trainer.deleteOne(query);
+      console.log(result);
+      res.send(result);
+    });
+    app.get(`/fitness/single-trainer/:id`, async (req, res) => {
+      const id = req.params.id;
+  
+      const query ={_id: new ObjectId(id)};
+      const result = await Trainer.findOne(query);
+  
+      res.send(result);
+    });
+    {
+      /* member */
+    }
 
     /* ======================================================================== */
     /* ========================🚩🚩🚩=========================================
@@ -581,8 +639,7 @@ const result=await Trainer.findOne(querys)
 
     // /await client.db("admin").command({ ping: 1 });
     //console.log(
-      "Pinged your deploymensdft. You successfully connected to MongoDB!"
-
+    ("Pinged your deploymensdft. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
