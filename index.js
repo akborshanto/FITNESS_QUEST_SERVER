@@ -96,6 +96,11 @@ async function run() {
       const result = await userCollect.find().toArray();
       res.send(result);
     });
+    app.get("/fitness/allTrainerNew", async (req, res) => {
+      const result = await Trainer.find().toArray();
+      res.send(result);
+    });
+
     {
       /* delete */
     }
@@ -110,11 +115,11 @@ const query={email:email}
     app.post("/fitness/userFitness", async (req, res) => {
       try {
         const data = req.body;
-        //console.log(data);
+        ////console.log(data);
         const result = await userCollect.insertOne(data);
         res.send(result);
       } catch (error) {
-        console.error(error);
+        //console.error(error);
         res.status(500).send("An error occurred");
       }
     });
@@ -136,7 +141,7 @@ const query={email:email}
 
     app.get("/users/role/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email, "DSFDSds");
+      //console.log(email, "DSFDSds");
       const query = { email: email };
       const user = await userCollect.findOne(query);
 
@@ -213,9 +218,10 @@ const query={email:email}
         },
       };
       const updateRole = await userCollect.updateOne(findUser, update);
+      const makeTrainer=await Trainer.insertOne(trainerInfo)
       const result = await pendingTrainer.deleteOne(query);
 
-      console.log(result);
+      //console.log(result);
       res.send(result);
     });
     app.delete(`/applictionBecameTrainerDelete/:id`, async (req, res) => {
@@ -223,7 +229,7 @@ const query={email:email}
 
       const result = await pendingTrainer.deleteOne({ _id: new ObjectId(id) });
 
-      console.log(result);
+      //console.log(result);
       res.send(result);
     });
 
@@ -246,10 +252,26 @@ app.post("/fitness/newClass-forum", async (req, res) => {
 
     app.post("/fitness/subsciber", async (req, res) => {
       const trainer = req.body;
-      // console.log(trainer)
+      // //console.log(trainer)
       const result = await Subscriber.insertOne(trainer);
       res.send(result);
     });
+
+    {/* dashboard trainer */}
+    app.get("/fitness/booked-trainser/:email", async (req, res) => {
+      const email=req.params.email;
+const querys={email:email}
+
+const result=await Trainer.findOne(querys)
+
+      
+           // const result = await Trainer.find().toArray();
+            res.send(result);
+          });
+          app.get("/fitness/allTrainerNew", async (req, res) => {
+            const result = await Trainer.find().toArray();
+            res.send(result);
+          });
 
     /* ======================================================================== */
     /* ========================🚩🚩🚩=========================================
@@ -258,9 +280,9 @@ app.post("/fitness/newClass-forum", async (req, res) => {
 
     app.post("/create-payment-intent", async (req, res) => {
       const { price } = req.body;
-      console.log(price);
+      //console.log(price);
       const amount = price * 100;
-      console.log(amount);
+      //console.log(amount);
 
       // Create a PaymentIntent with the order amount and currency
       const paymentIntent = await stripe.paymentIntents.create({
@@ -272,7 +294,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
         // },
         payment_method_types: ["card"],
       });
-      console.log({ paymentIntent });
+      //console.log({ paymentIntent });
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
@@ -287,7 +309,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
 
     app.post("/payment-card", async (req, res) => {
       const payment = req.body;
-      console.log(payment);
+      //console.log(payment);
       const paymentResult = await paymentCollection.insertOne(payment);
       res.send(paymentResult);
     });
@@ -314,7 +336,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
 ========================================================================= */
     app.get("/moduleUser/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email);
+      //console.log(email);
       const result = await roleCollection.findOne({ email });
       res.send(result);
     });
@@ -328,7 +350,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
         return res.send({ message: "USER ALLLRETDT AXIST" });
       }
       const result = await roleCollection.insertOne(user);
-      // console.log(result);
+      // //console.log(result);
       res.send(result);
     });
 
@@ -347,7 +369,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
     app.get("/forum", async (req, res) => {
       const page = parseInt(req.query.page);
       const size = parseInt(req.query.size);
-      // console.log(req.query)
+      // //console.log(req.query)
       const result = await forumCollection
         .find()
 
@@ -364,7 +386,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
       const query = { _id: new ObjectId(id) };
 
       const result = await forumCollection.findOne(query);
-      // console.log(result);
+      // //console.log(result);
       res.send(result);
     });
 
@@ -373,7 +395,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
       const query = req.body;
 
       const result = await forumCollection.insertOne(query);
-      // console.log(result);
+      // //console.log(result);
       res.send(result);
     });
 
@@ -389,7 +411,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
     /* post method */
     app.post("/newsLetter", async (req, res) => {
       const query = req.body;
-      // console.log(query);
+      // //console.log(query);
       const result = await newsLetterCollection.insertOne(query);
       res.send(result);
     });
@@ -418,7 +440,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
 
     app.get("/trainer-single-detail/:id", async (req, res) => {
       const id = req.params.id;
-      // console.log(id);
+      // //console.log(id);
       const query = { _id: new ObjectId(id) };
       const result = await becomeTrainerCollection.findOne(query);
       res.send(result);
@@ -448,7 +470,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
 
     app.post("/allTr", async (req, res) => {
       const ALL_TRAINER = req.body;
-      console.log(ALL_TRAINER);
+      //console.log(ALL_TRAINER);
       const result = await ALL_TRAINERCollection.insertOne(ALL_TRAINER);
       res.send(result);
     });
@@ -470,7 +492,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
     /* single trainer Data */
     app.get("/singleTrainerData/:id", async (req, res) => {
       const id = req.params.id;
-      // console.log(id);
+      // //console.log(id);
       const query = { _id: new ObjectId(id) };
       const result = await becomeTrainerCollection.findOne(query);
       res.send(result);
@@ -500,9 +522,9 @@ app.post("/fitness/newClass-forum", async (req, res) => {
     /* add new classs */
     app.post("/addnewClassAdmin", async (req, res) => {
       const query = req.body;
-      console.log(query);
+      //console.log(query);
       const result = await addNewClassAdminCollection.insertOne(query);
-      console.log(result);
+      //console.log(result);
       res.send(result);
     });
 
@@ -513,9 +535,9 @@ app.post("/fitness/newClass-forum", async (req, res) => {
 
     app.post("/add-NewSlot-Trainer", async (req, res) => {
       const query = req.body;
-      console.log(query);
+      //console.log(query);
       const result = await addNewSlotTrainer.insertOne(query);
-      console.log(result);
+      //console.log(result);
       res.send(result);
     });
 
@@ -544,7 +566,7 @@ app.post("/fitness/newClass-forum", async (req, res) => {
 
     app.get("/bookTrainer/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email, "EMAIL");
+      //console.log(email, "EMAIL");
       const query = { "userInfo.userEmail": email };
 
       // const query = { 'email': email };
@@ -558,9 +580,9 @@ app.post("/fitness/newClass-forum", async (req, res) => {
 ========================================================================= */
 
     // /await client.db("admin").command({ ping: 1 });
-    console.log(
+    //console.log(
       "Pinged your deploymensdft. You successfully connected to MongoDB!"
-    );
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -577,5 +599,5 @@ app.get("/", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log("ASSINGMENT 12 LINTENTING 12 ");
+  //console.log("ASSINGMENT 12 LINTENTING 12 ");
 });
