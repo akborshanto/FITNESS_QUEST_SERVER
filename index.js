@@ -80,6 +80,7 @@ async function run() {
     const pendingTrainer = client.db("fitQuest").collection("pendingTrainer");
     const Subscriber = client.db("fitQuest").collection("subscriberFitness");
     const newClassFroum = client.db("fitQuest").collection("newClassFroum");
+    const manageSlot = client.db("fitQuest").collection("manage-slot");
     /* ============================================================================================================ */
 
     {
@@ -327,9 +328,17 @@ async function run() {
   
       res.send(result);
     });
-    {
-      /* member */
-    }
+
+/* manage slot  */
+
+app.post("/fitness/manage-slot", async (req, res) => {
+  const mangeSlot = req.body;
+  // //console.log(trainer)
+  const result = await manageSlot.insertOne(mangeSlot);
+
+  res.send(result);
+});
+
 
     /* ======================================================================== */
     /* ========================🚩🚩🚩=========================================
@@ -371,268 +380,8 @@ async function run() {
       const paymentResult = await paymentCollection.insertOne(payment);
       res.send(paymentResult);
     });
-    /* ========================🚩🚩🚩=========================================
-                    RATINGNG_COLLECTION
-========================================================================= */
-    /* get all ratin */
-    app.get("/rating", async (req, res) => {
-      const result = await ratingCollection.find().toArray();
-      res.send(result);
-    });
 
-    /* post method */
-
-    app.post("/rating", async (req, res) => {
-      const query = req.body;
-
-      const result = await ratingCollection.insertOne(query);
-      res.send(result);
-    });
-
-    /* ========================🚩🚩🚩=========================================
-                        ZONKAR COLLECTION
-========================================================================= */
-    app.get("/moduleUser/:email", async (req, res) => {
-      const email = req.params.email;
-      //console.log(email);
-      const result = await roleCollection.findOne({ email });
-      res.send(result);
-    });
-    app.post("/moduleUser", async (req, res) => {
-      const user = req.body;
-
-      const query = { email: user.email };
-
-      const existingUser = await roleCollection.findOne(query);
-      if (existingUser) {
-        return res.send({ message: "USER ALLLRETDT AXIST" });
-      }
-      const result = await roleCollection.insertOne(user);
-      // //console.log(result);
-      res.send(result);
-    });
-
-    /* ========================🚩🚩🚩=========================================
-                    FORUM _COLLECTION
-========================================================================= */
-
-    /* pagination */
-
-    app.get("/all-forum-count", async (req, res) => {
-      const count = await forumCollection.estimatedDocumentCount();
-      res.send({ count });
-    });
-
-    /*  */
-    app.get("/forum", async (req, res) => {
-      const page = parseInt(req.query.page);
-      const size = parseInt(req.query.size);
-      // //console.log(req.query)
-      const result = await forumCollection
-        .find()
-
-        .skip(page * size)
-        .limit(size)
-        .toArray();
-      res.send(result);
-    });
-
-    /* get the singe data from FORUMCOLELCTION */
-    app.get("/forums/:id", async (req, res) => {
-      const id = req.params.id;
-
-      const query = { _id: new ObjectId(id) };
-
-      const result = await forumCollection.findOne(query);
-      // //console.log(result);
-      res.send(result);
-    });
-
-    /* post method */
-    app.post("/forum", async (req, res) => {
-      const query = req.body;
-
-      const result = await forumCollection.insertOne(query);
-      // //console.log(result);
-      res.send(result);
-    });
-
-    /* ========================🚩🚩🚩=========================================
-                        NEWS LETTER COLLECTION
-========================================================================= */
-    /* get methos */
-    app.get("/news-letter", async (req, res) => {
-      const result = await newsLetterCollection.find().toArray();
-      res.send(result);
-    });
-
-    /* post method */
-    app.post("/newsLetter", async (req, res) => {
-      const query = req.body;
-      // //console.log(query);
-      const result = await newsLetterCollection.insertOne(query);
-      res.send(result);
-    });
-    /* ========================🚩🚩🚩=========================================
-                     TRAINNER BOOKING COLLECTION
-========================================================================= */
-
-    /* get method */
-    app.get("/trainer-booking", async (req, res) => {
-      const result = await trainerCollection.find().toArray();
-      res.send(result);
-    });
-
-    /* post method */
-    app.post("/trainer-booking", async (req, res) => {
-      const qury = req.body;
-
-      const result = await trainerCollection.insertOne(qury);
-
-      res.send(result);
-    });
-
-    /* ========================🚩🚩🚩=========================================
-                        BEOME TRAINER COLLECTION
-========================================================================= */
-
-    app.get("/trainer-single-detail/:id", async (req, res) => {
-      const id = req.params.id;
-      // //console.log(id);
-      const query = { _id: new ObjectId(id) };
-      const result = await becomeTrainerCollection.findOne(query);
-      res.send(result);
-    });
-
-    /* get mehtod beacome a trainer */
-    app.get("/become-trainer", async (req, res) => {
-      const result = await becomeTrainerCollection.find().toArray();
-      res.send(result);
-    });
-
-    /* post method become a trainer */
-    app.post("/become-trainer", async (req, res) => {
-      const becomeTrainer = req.body;
-
-      const result = await becomeTrainerCollection.insertOne(becomeTrainer);
-      res.send(result);
-    });
-
-    /* ========================🚩🚩🚩=========================================
-                 ADMIN DASHBOARD
-========================================================================= */
-    app.get("/allTr", async (req, res) => {
-      const result = (await ALL_TRAINERCollection.find().toArray()) || {};
-      res.send(result);
-    });
-
-    app.post("/allTr", async (req, res) => {
-      const ALL_TRAINER = req.body;
-      //console.log(ALL_TRAINER);
-      const result = await ALL_TRAINERCollection.insertOne(ALL_TRAINER);
-      res.send(result);
-    });
-
-    /* role collection */
-    app.patch("/role/admin/:email", async (req, res) => {
-      const email = req.params.email;
-
-      const updateDoc = {
-        $set: {
-          role: "trainer",
-        },
-      };
-
-      const result = await roleCollection.updateOne({ email }, updateDoc);
-      res.send(result);
-    });
-
-    /* single trainer Data */
-    app.get("/singleTrainerData/:id", async (req, res) => {
-      const id = req.params.id;
-      // //console.log(id);
-      const query = { _id: new ObjectId(id) };
-      const result = await becomeTrainerCollection.findOne(query);
-      res.send(result);
-    });
-
-    /* pagination */
-    app.get("/addNewClassAdmins", async (req, res) => {
-      const count = await addNewClassAdminCollection.estimatedDocumentCount();
-      res.send({ count });
-    });
-
-    /* add new collectiion */
-    app.get("/addnewClassAdmin", async (req, res) => {
-      const page = parseInt(req.query.page);
-      const size = parseInt(req.query.size);
-
-      const result = await addNewClassAdminCollection
-        .find()
-
-        .skip(page * size)
-        .limit(size)
-        .toArray();
-
-      res.send(result);
-    });
-
-    /* add new classs */
-    app.post("/addnewClassAdmin", async (req, res) => {
-      const query = req.body;
-      //console.log(query);
-      const result = await addNewClassAdminCollection.insertOne(query);
-      //console.log(result);
-      res.send(result);
-    });
-
-    /* add */
-    /* ========================🚩🚩🚩=========================================
-               TRAINERDASHBOARD
-========================================================================= */
-
-    app.post("/add-NewSlot-Trainer", async (req, res) => {
-      const query = req.body;
-      //console.log(query);
-      const result = await addNewSlotTrainer.insertOne(query);
-      //console.log(result);
-      res.send(result);
-    });
-
-    app.get("/addNewSlotTrainer/:email", async (req, res) => {
-      const email = req.params.email;
-
-      const query = { email: email };
-
-      // const query = { 'email': email };
-      const result = await becomeTrainerCollection.find(query).toArray();
-      res.send(result);
-    });
-
-    /* delete trainer */
-    app.delete("/manageSlot/:id", async (req, res) => {
-      const id = req.params.id;
-
-      const query = { _id: new ObjectId(id) };
-      const result = await trainerCollection.deleteOne(query);
-      res.send(result);
-    });
-
-    /* ========================🚩🚩🚩=========================================
-                       MEMBER
-========================================================================= */
-
-    app.get("/bookTrainer/:email", async (req, res) => {
-      const email = req.params.email;
-      //console.log(email, "EMAIL");
-      const query = { "userInfo.userEmail": email };
-
-      // const query = { 'email': email };
-      const result = await trainerCollection.find(query).toArray();
-
-      res.send(result);
-    });
-
+   
     /* ========================🚩🚩🚩=========================================
 
 ========================================================================= */
