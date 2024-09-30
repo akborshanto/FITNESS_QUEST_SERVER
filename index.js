@@ -79,7 +79,7 @@ async function run() {
     const classFitness = client.db("fitQuest").collection("classFitness");
     const pendingTrainer = client.db("fitQuest").collection("pendingTrainer");
     const Subscriber = client.db("fitQuest").collection("subscriberFitness");
-    const newClassFroum = client.db("fitQuest").collection("newClassFroum");
+    const newClass = client.db("fitQuest").collection("newClassFroum");
     const manageSlot = client.db("fitQuest").collection("manage-slot");
     /* ============================================================================================================ */
 
@@ -203,7 +203,7 @@ async function run() {
     });
     app.get("/fitness/pending-single-trainers/:email", async (req, res) => {
       const email = req.params.email;
- 
+
       try {
         // Construct the query to find the document by its ID
         const query = { email: email };
@@ -222,27 +222,30 @@ async function run() {
         res.status(500).send({ message: "An error occurred" });
       }
     });
-    app.delete("/fitness/pending-single-trainersDeletee/:email", async (req, res) => {
-      const email = req.params.email;
+    app.delete(
+      "/fitness/pending-single-trainersDeletee/:email",
+      async (req, res) => {
+        const email = req.params.email;
 
-      try {
-        // Construct the query to find the document by its ID
-        const query = { email: email };
+        try {
+          // Construct the query to find the document by its ID
+          const query = { email: email };
 
-        // Retrieve the specific pending trainer document
-        const result = await userCollect.deleteOne(query);
+          // Retrieve the specific pending trainer document
+          const result = await userCollect.deleteOne(query);
 
-        // Send the result back to the client
-        if (result) {
-          res.send(result);
-        } else {
-          res.status(404).send({ message: "Trainer not found" });
+          // Send the result back to the client
+          if (result) {
+            res.send(result);
+          } else {
+            res.status(404).send({ message: "Trainer not found" });
+          }
+        } catch (error) {
+          console.error(error);
+          res.status(500).send({ message: "An error occurred" });
         }
-      } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: "An error occurred" });
       }
-    });
+    );
 
     {
       /*dashboard  admin */
@@ -274,6 +277,10 @@ async function run() {
     {
       /* forum */
     }
+
+    [
+      /* newClassFroumCOllection */
+    ];
     app.post("/fitness/newClass-forum", async (req, res) => {
       const trainer = req.body;
 
@@ -281,6 +288,14 @@ async function run() {
 
       res.send(result);
     });
+
+    {
+      /*    app.get("/fitness/new-class", async (req, res) => {
+      const result = await newClass.find().toArray();
+      res.send(result);
+    }); */
+    }
+
     {
       /* subscriber */
     }
@@ -322,24 +337,42 @@ async function run() {
     });
     app.get(`/fitness/single-trainer/:id`, async (req, res) => {
       const id = req.params.id;
-  
-      const query ={_id: new ObjectId(id)};
+
+      const query = { _id: new ObjectId(id) };
       const result = await Trainer.findOne(query);
-  
+
       res.send(result);
     });
 
-/* manage slot  */
+    /* manage slot  */
 
-app.post("/fitness/manage-slot", async (req, res) => {
-  const mangeSlot = req.body;
-  // //console.log(trainer)
-  const result = await manageSlot.insertOne(mangeSlot);
+    app.post("/fitness/manage-slot", async (req, res) => {
+      const mangeSlot = req.body;
+    //  console.log(mangeSlot);
+      const email=mangeSlot.email;
+      const query={email:email}
 
-  res.send(result);
-});
+      const updatetedData = {
+              
+        $push: {
+            slots: req.body.slot,
+        }
+    }
 
+      const findTrainer=await Trainer.updateOne(query,updatetedData)
+// console.log(findTrainer)
+      res.send(findTrainer);
+    });
+/*     app.get("/fitness/manage-slots/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
 
+      const result = await manageSlot.find(query).toArray();
+
+      // const result = await Trainer.find().toArray();
+      res.send(result);
+    });
+ */
     /* ======================================================================== */
     /* ========================🚩🚩🚩=========================================
                   STRIPE COLLECTION
@@ -381,7 +414,6 @@ app.post("/fitness/manage-slot", async (req, res) => {
       res.send(paymentResult);
     });
 
-   
     /* ========================🚩🚩🚩=========================================
 
 ========================================================================= */
