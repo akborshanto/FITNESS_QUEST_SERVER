@@ -1,4 +1,6 @@
 require("dotenv").config();
+
+const jwt = require('jsonwebtoken')
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
@@ -83,6 +85,60 @@ async function run() {
     const manageSlot = client.db("fitQuest").collection("manage-slot");
     /* ============================================================================================================ */
 
+    /* jwt use */
+
+// middlewears ------------------------------------------
+const verifytoken = (req, res, next) => {
+  // console.log('inside verify token', req.headers.authorization);
+  if (!req.headers.authorization) {
+      return res.status(401).send({ message: 'unauthorized access' });
+  }
+  const token = req.headers.authorization.split(' ')[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+          return res.status(401).send({ message: 'unauthorized access' })
+      }
+      req.decoded = decoded;
+
+      next();
+  })
+}
+
+
+const verifyAdmin = async (req, res, next) => {
+  const email = req.decoded.email;
+  const query = { email: email };
+  const user = await userCollect.findOne(query);
+  // console.log(user)
+  const isAdmin = user?.role === 'admin';
+  if (!isAdmin) {
+      return res.status(403).send({ message: 'forbidden access' });
+  }
+
+  next();
+}
+
+const verifyTrainer = async (req, res, next) => {
+  const email = req.decoded.email;
+  const query = { email: email };
+  const user = await userCollect.findOne(query);
+  const isTrainer = user?.role === 'trainer';
+  if (!isTrainer) {
+      return res.status(403).send({ message: 'forbidden access' });
+  }}
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+//console.log(user)
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
+
+
+
+      
+    });
+
     {
       /* all trainer */
     }
@@ -97,7 +153,7 @@ async function run() {
       const result = await userCollect.find().toArray();
       res.send(result);
     });
-    app.get("/fitness/allTrainerNew", async (req, res) => {
+    app.get("/fitness/allTrainerNew", verifytoken,verifyAdmin,async (req, res) => {
       const result = await Trainer.find().toArray();
       res.send(result);
     });
@@ -362,15 +418,15 @@ async function run() {
       // console.log(findTrainer)
       res.send(findTrainer);
     });
-  //  app.get("/fitness/manage-slots/:email", async (req, res) => {
-  //     const email = req.params.email;
-  //     const query = { email: email };
+    //  app.get("/fitness/manage-slots/:email", async (req, res) => {
+    //     const email = req.params.email;
+    //     const query = { email: email };
 
-  //     const result = await manageSlot.find(query).toArray();
+    //     const result = await manageSlot.find(query).toArray();
 
-  //     // const result = await Trainer.find().toArray();
-  //     res.send(result);
-  //   });
+    //     // const result = await Trainer.find().toArray();
+    //     res.send(result);
+    //   });
 
     /* ======================================================================== */
     /* ========================🚩🚩🚩=========================================
