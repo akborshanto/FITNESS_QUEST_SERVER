@@ -335,9 +335,9 @@ async function run() {
       console.log(result);
       res.send(result);
     });
-    app.get(`/fitness/single-trainer/:id`, async (req, res) => {
+    app.get(`/fitness/single-slot-id/:id`, async (req, res) => {
       const id = req.params.id;
-
+      //console.log("IDDDDDDD",id)
       const query = { _id: new ObjectId(id) };
       const result = await Trainer.findOne(query);
 
@@ -348,74 +348,33 @@ async function run() {
 
     app.post("/fitness/manage-slot", async (req, res) => {
       const mangeSlot = req.body;
-    //  console.log(mangeSlot);
-      const email=mangeSlot.email;
-      const query={email:email}
-
-      const updatetedData = {
-              
-        $push: {
-            slots: req.body.slot,
-        }
-    }
-
-      const findTrainer=await Trainer.updateOne(query,updatetedData)
-// console.log(findTrainer)
-      res.send(findTrainer);
-    });
-/*     app.get("/fitness/manage-slots/:email", async (req, res) => {
-      const email = req.params.email;
+      //  console.log(mangeSlot);
+      const email = mangeSlot.email;
       const query = { email: email };
 
-      const result = await manageSlot.find(query).toArray();
+      const updatetedData = {
+        $push: {
+          slots: req.body.slot,
+        },
+      };
 
-      // const result = await Trainer.find().toArray();
-      res.send(result);
+      const findTrainer = await Trainer.updateOne(query, updatetedData);
+      // console.log(findTrainer)
+      res.send(findTrainer);
     });
- */
+  //  app.get("/fitness/manage-slots/:email", async (req, res) => {
+  //     const email = req.params.email;
+  //     const query = { email: email };
+
+  //     const result = await manageSlot.find(query).toArray();
+
+  //     // const result = await Trainer.find().toArray();
+  //     res.send(result);
+  //   });
+
     /* ======================================================================== */
     /* ========================🚩🚩🚩=========================================
                   STRIPE COLLECTION
-========================================================================= */
-
-    app.post("/create-payment-intent", async (req, res) => {
-      const { price } = req.body;
-      //console.log(price);
-      const amount = price * 100;
-      //console.log(amount);
-
-      // Create a PaymentIntent with the order amount and currency
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount,
-        currency: "usd",
-        // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
-        // automatic_payment_methods: {
-        //   enabled: true,
-        // },
-        payment_method_types: ["card"],
-      });
-      //console.log({ paymentIntent });
-      res.send({
-        clientSecret: paymentIntent.client_secret,
-      });
-    });
-
-    app.get("/payment-card", async (req, res) => {
-      const payment = req.body;
-
-      const paymentResult = await paymentCollection.find().toArray();
-      res.send(paymentResult);
-    });
-
-    app.post("/payment-card", async (req, res) => {
-      const payment = req.body;
-      //console.log(payment);
-      const paymentResult = await paymentCollection.insertOne(payment);
-      res.send(paymentResult);
-    });
-
-    /* ========================🚩🚩🚩=========================================
-
 ========================================================================= */
 
     // /await client.db("admin").command({ ping: 1 });
