@@ -11,13 +11,21 @@ const stripe = require("stripe")(process.env.SECRET_STRIPE);
 const port = process.env.PORT || 5000;
 const app = express();
 
-const corsOptions = {
-  origin: ["http://localhost:5173","https://fitness-5ee62.web.app/all-trainer"],
-  credentials: true,
-  optionSuccessStatus: 200,
-};
+// const corsOptions = {
+//   origin: ["http://localhost:5173","https://fitness-5ee62.web.app"],
+//   credentials: true,
+//   optionSuccessStatus: 200,
+// };
+app.use(cors({
+  origin: [
+      'http://localhost:5173',
+"     https://fitness-5ee62.web.app","https://kaleidoscopic-douhua-18096f.netlify.app"
 
-app.use(cors(corsOptions));
+  ],
+  credentials: true
+}));
+
+// app.use(cors(corsOptions));
 app.use(express.json());
 
 /* stripe */
