@@ -5,8 +5,7 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
-// This is your test secret API key.
-const stripe = require("stripe")(process.env.SECRET_STRIPE);
+
 
 const port = process.env.PORT || 5000;
 const app = express();
