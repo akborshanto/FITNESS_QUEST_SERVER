@@ -262,6 +262,7 @@ const verifyTrainer = async (req, res, next) => {
         }
       } catch (error) {
         console.error(error);
+        console.log(error,"dasf")
         res.status(500).send({ message: "An error occurred" });
       }
     });
